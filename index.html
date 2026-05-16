@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RunTrack Elite PRO - Master Analytics</title>
+    <title>RunTrack Elite PRO - Master Sync v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -13,11 +13,14 @@
         .metric-pill { @apply bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Estilo da Tabela de Splits */
+        .split-row:nth-child(even) { background-color: #f8fafc; }
+        .split-km { font-weight: 900; color: #64748b; font-size: 10px; }
     </style>
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- HEADER PRO -->
+    <!-- HEADER -->
     <header class="bg-slate-900 text-white shadow-2xl sticky top-0 z-50 p-4 border-b-2 border-orange-600">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -26,21 +29,10 @@
                 </div>
                 <div>
                     <h1 class="text-sm font-black tracking-tighter uppercase leading-none" id="display-nome">Atleta Elite</h1>
-                    <p class="text-[8px] text-orange-400 font-bold uppercase tracking-widest mt-1">Sincronização Ativa</p>
+                    <p class="text-[8px] text-orange-400 font-bold uppercase tracking-widest mt-1">Análise KM a KM</p>
                 </div>
             </div>
             
-            <div class="hidden md:flex gap-4">
-                <div class="bg-slate-800 p-2 px-5 rounded-xl border border-slate-700 text-center">
-                    <span class="text-[7px] block uppercase opacity-50 font-black tracking-widest">VO2 Est.</span>
-                    <span class="text-lg font-black text-emerald-400 font-mono-performance" id="display-vo2">--</span>
-                </div>
-                <div class="bg-slate-800 p-2 px-5 rounded-xl border border-slate-700 text-center">
-                    <span class="text-[7px] block uppercase opacity-50 font-black tracking-widest">Eficiência</span>
-                    <span class="text-lg font-black text-blue-400 font-mono-performance" id="display-eficiencia">--</span>
-                </div>
-            </div>
-
             <button onclick="toggleModal('modal-perfil')" class="bg-slate-800 hover:bg-slate-700 p-2 px-4 rounded-xl transition border border-slate-600 text-xs font-bold uppercase">
                 <i class="fas fa-cog"></i>
             </button>
@@ -48,97 +40,66 @@
     </header>
 
     <main class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <!-- COLUNA ESQUERDA: LISTA -->
+        <!-- LISTA -->
         <div class="lg:col-span-8 space-y-6">
             <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-200">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
                     <div>
-                        <h2 class="text-xl font-black text-slate-800 uppercase italic">Histórico de Performance</h2>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase">Clique no treino para análise minuciosa</p>
+                        <h2 class="text-xl font-black text-slate-800 uppercase italic">Meus Treinos</h2>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Clique para ver os parciais por KM</p>
                     </div>
                     <button onclick="iniciarConexaoStrava()" class="w-full md:w-auto bg-[#FC6100] text-white px-8 py-4 rounded-2xl font-black text-xs tracking-widest hover:scale-105 transition shadow-lg flex items-center justify-center gap-3">
                         <i class="fab fa-strava text-lg"></i> SINCRONIZAR STRAVA
                     </button>
                 </div>
-
-                <div id="lista-treinos" class="space-y-3">
-                    <div class="text-center py-20 text-slate-300 italic text-sm">Abra as configurações para conectar sua conta.</div>
-                </div>
+                <div id="lista-treinos" class="space-y-3"></div>
             </div>
         </div>
 
-        <!-- COLUNA DIREITA: DASHBOARD -->
+        <!-- DASHBOARD LATERAL -->
         <div class="lg:col-span-4 space-y-6">
-            <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                <h3 class="text-orange-500 font-black uppercase text-[10px] tracking-widest mb-4 italic">Volume Acumulado</h3>
-                <div class="flex items-baseline gap-2">
+            <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl">
+                <h3 class="text-orange-500 font-black uppercase text-[10px] tracking-widest mb-4 italic text-center">Resumo Total</h3>
+                <div class="text-center">
                     <span class="text-6xl font-black tracking-tighter" id="total-km">0</span>
                     <span class="text-xl font-bold opacity-40">KM</span>
-                </div>
-                <div class="mt-8 pt-6 border-t border-white/10 grid grid-cols-2 gap-4 text-center">
-                    <div><p class="text-[9px] font-black uppercase opacity-40">Atividades</p><p class="text-xl font-black" id="count-treinos">0</p></div>
-                    <div><p class="text-[9px] font-black uppercase opacity-40">Pace Médio</p><p class="text-xl font-black font-mono-performance" id="pace-geral">--</p></div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
-                <h3 class="text-slate-800 font-black uppercase text-[10px] tracking-widest mb-6 italic">Simulador de Ritmo</h3>
-                <div class="space-y-4">
-                    <div class="bg-slate-50 p-4 rounded-2xl border">
-                        <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Distância (KM)</label>
-                        <input type="number" id="sim-dist" value="10" oninput="ajustarSimulador()" class="w-full bg-transparent text-2xl font-black outline-none">
-                    </div>
-                    <div class="flex gap-2">
-                        <div class="flex-1 bg-slate-50 p-4 rounded-2xl border text-center">
-                            <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Minutos</label>
-                            <input type="number" id="sim-pace-min" value="5" oninput="ajustarSimulador()" class="w-full bg-transparent text-xl font-black outline-none text-center">
-                        </div>
-                        <div class="flex-1 bg-slate-50 p-4 rounded-2xl border text-center">
-                            <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Segundos</label>
-                            <input type="number" id="sim-pace-seg" value="0" oninput="ajustarSimulador()" class="w-full bg-transparent text-xl font-black outline-none text-center">
-                        </div>
-                    </div>
-                    <div class="bg-blue-600 text-white p-5 rounded-2xl text-center shadow-lg">
-                        <span class="text-[9px] uppercase font-black opacity-60 block">Velocidade Requerida</span>
-                        <p class="text-2xl font-black"><span id="sim-vel-res">12,0</span> <small class="text-xs">KM/H</small></p>
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- MODAL DE ANÁLISE MINUCIOSA (TREINO) -->
+    <!-- MODAL DE ANÁLISE MINUCIOSA (COM SPLITS) -->
     <div id="modal-detalhes" class="fixed inset-0 bg-slate-900/95 backdrop-blur-xl hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-2xl rounded-[3rem] p-8 md:p-12 shadow-2xl overflow-y-auto max-h-[90vh] fade-in">
-            <div id="detalhes-corpo" class="space-y-6">
-                <!-- Conteúdo gerado via JS -->
+        <div class="bg-white w-full max-w-2xl rounded-[3rem] p-6 md:p-10 shadow-2xl overflow-y-auto max-h-[90vh] fade-in">
+            <div id="detalhes-corpo">
+                <!-- Conteúdo dos Splits entra aqui via JS -->
             </div>
-            <button onclick="toggleModal('modal-detalhes')" class="w-full mt-8 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase text-[10px] hover:bg-slate-200 transition">Voltar ao Painel</button>
+            <button onclick="toggleModal('modal-detalhes')" class="w-full mt-6 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase text-[10px]">Fechar Análise</button>
         </div>
     </div>
 
     <!-- MODAL PERFIL -->
     <div id="modal-perfil" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden z-[100] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl">
-            <h3 class="text-2xl font-black mb-8 text-center text-slate-800 uppercase italic">Configurações Strava</h3>
+        <div class="bg-white w-full max-w-md rounded-[3rem] p-8 shadow-2xl text-center">
+            <h3 class="text-xl font-black mb-6 text-slate-800 uppercase italic">Configuração</h3>
             <form onsubmit="event.preventDefault(); salvarPerfil()" class="space-y-4">
-                <div class="bg-orange-50 p-6 rounded-3xl border border-orange-100">
-                    <input type="text" id="strava-id" placeholder="Client ID" class="w-full p-4 mb-2 rounded-xl border-none outline-none font-bold text-center shadow-sm">
-                    <input type="password" id="strava-secret" placeholder="Client Secret" class="w-full p-4 rounded-xl border-none outline-none font-bold text-center shadow-sm">
+                <div class="bg-orange-50 p-6 rounded-3xl border border-orange-100 space-y-2">
+                    <input type="text" id="strava-id" placeholder="Client ID" class="w-full p-3 rounded-xl border-none outline-none font-bold text-center text-sm shadow-sm">
+                    <input type="password" id="strava-secret" placeholder="Client Secret" class="w-full p-3 rounded-xl border-none outline-none font-bold text-center text-sm shadow-sm">
                 </div>
                 <input type="text" id="p-nome" placeholder="Seu Nome" class="w-full border-2 p-4 rounded-2xl font-bold text-center outline-none">
-                <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-xs shadow-xl">Salvar e Conectar</button>
-                <button type="button" onclick="limparTudo()" class="w-full bg-red-50 text-red-500 py-2 rounded-xl font-bold uppercase text-[8px] mt-4">Resetar App (Limpar Cache)</button>
+                <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-xl">Salvar Perfil</button>
+                <button type="button" onclick="limparTudo()" class="w-full bg-red-50 text-red-500 py-2 rounded-xl font-bold uppercase text-[8px]">Limpar Tudo</button>
             </form>
         </div>
     </div>
 
     <script>
-        let appData = { atleta: { nome: "Atleta Elite", stravaId: "", stravaSecret: "", peso: 75, idade: 30 }, treinos: [] };
+        let appData = { atleta: { nome: "Atleta Elite", stravaId: "", stravaSecret: "" }, treinos: [] };
+        let currentToken = ""; // Mantemos o token na sessão para buscar detalhes
 
         window.onload = () => {
-            const saved = localStorage.getItem('RunTrackElite_Master_VFinal');
+            const saved = localStorage.getItem('RunTrackElite_Master_VSplits');
             if (saved) appData = JSON.parse(saved);
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -148,25 +109,13 @@
                 finalizarConexao(code);
             }
             atualizarInterface();
-            ajustarSimulador();
         };
 
         function iniciarConexaoStrava() {
-            const clientId = appData.atleta.stravaId ? appData.atleta.stravaId.toString().trim() : "";
-            if(!clientId) {
-                alert("Configure seu Client ID no perfil primeiro!");
-                toggleModal('modal-perfil');
-                return;
-            }
+            const clientId = appData.atleta.stravaId.trim();
+            if(!clientId) { alert("Configure seu ID no perfil!"); toggleModal('modal-perfil'); return; }
             const redirectUri = window.location.origin + window.location.pathname;
-            const scope = "activity:read_all";
-            const authUrl = "https://www.strava.com/oauth/authorize?" + 
-                           "client_id=" + clientId + 
-                           "&redirect_uri=" + encodeURIComponent(redirectUri) + 
-                           "&response_type=code" + 
-                           "&scope=" + scope + 
-                           "&approval_prompt=auto";
-            window.location.href = authUrl;
+            window.location.href = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=activity:read_all&approval_prompt=auto`;
         }
 
         async function finalizarConexao(code) {
@@ -176,103 +125,104 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        client_id: appData.atleta.stravaId.toString().trim(),
-                        client_secret: appData.atleta.stravaSecret.toString().trim(),
+                        client_id: appData.atleta.stravaId.trim(),
+                        client_secret: appData.atleta.stravaSecret.trim(),
                         code: code,
                         grant_type: 'authorization_code'
                     })
                 });
                 const data = await response.json();
-                if(data.access_token) buscarAtividades(data.access_token);
-                else alert("Erro: Client Secret inválido ou expirado.");
-            } catch (e) { alert("Erro de conexão com Strava."); }
+                if(data.access_token) {
+                    currentToken = data.access_token;
+                    buscarAtividades(data.access_token);
+                }
+            } catch (e) { alert("Erro de token."); }
         }
 
         async function buscarAtividades(token) {
-            toast("Analisando telemetria...");
+            toast("Buscando treinos...");
             try {
-                const resp = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=30', {
+                const resp = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=20', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const activities = await resp.json();
-                let novos = 0;
-                activities.forEach(a => {
+                
+                // Para cada atividade, buscamos o detalhe (Splits)
+                for (let a of activities) {
                     if(a.type === 'Run' && !appData.treinos.some(t => t.stravaId === a.id)) {
+                        // Busca detalhe do treino para pegar os splits
+                        const detailResp = await fetch(`https://www.strava.com/api/v3/activities/${a.id}`, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        const detail = await detailResp.json();
+
                         appData.treinos.unshift({
                             id: 'rt-' + Date.now() + Math.random(),
-                            stravaId: a.id, nome: a.name, data: a.start_date,
+                            stravaId: a.id,
+                            nome: a.name,
+                            data: a.start_date,
                             distancia: (a.distance / 1000).toFixed(2),
                             tempoSegundos: a.moving_time,
                             bpm: Math.round(a.average_heartrate || 0),
                             cadencia: Math.round(a.average_cadence * 2) || 0,
                             elevacao: Math.round(a.total_elevation_gain || 0),
-                            bpmMax: Math.round(a.max_heartrate || 0)
+                            splits: detail.splits_metric || [] // AQUI ESTÃO OS DADOS POR KM
                         });
-                        novos++;
                     }
-                });
+                }
                 atualizarInterface();
-                toast(novos + " Treinos Processados!");
-            } catch (e) { alert("Erro ao carregar telemetria detalhada."); }
+                toast("Treinos com parciais importados!");
+            } catch (e) { alert("Erro ao carregar detalhes."); }
         }
 
         function abrirAnalise(id) {
             const t = appData.treinos.find(x => x.id === id);
             if(!t) return;
 
-            const paceSegs = t.tempoSegundos / t.distancia;
-            const paceMin = Math.floor(paceSegs / 60);
-            const paceResto = Math.round(paceSegs % 60).toString().padStart(2, '0');
-            const kmh = (t.distancia / (t.tempoSegundos / 3600)).toFixed(1);
-            const eficiencia = t.bpm > 0 ? (kmh / t.bpm).toFixed(3) : "N/A";
+            const paceTotal = formatarPace(t.tempoSegundos / t.distancia);
             
-            const pred10k = formatarTempo(t.tempoSegundos * Math.pow((10 / t.distancia), 1.06));
-            const pred21k = formatarTempo(t.tempoSegundos * Math.pow((21.1 / t.distancia), 1.06));
+            // Gerar linhas da tabela de splits
+            let splitsHTML = t.splits.map((s, index) => {
+                const paceSplit = formatarPace(s.moving_time / (s.distance / 1000));
+                const bpmSplit = Math.round(s.average_heartrate || 0);
+                return `
+                    <tr class="split-row border-b border-slate-100">
+                        <td class="p-3 split-km">${index + 1} KM</td>
+                        <td class="p-3 font-mono-performance text-[11px] font-bold text-blue-600">${paceSplit}</td>
+                        <td class="p-3 font-mono-performance text-[11px] font-bold text-rose-500">${bpmSplit > 0 ? bpmSplit : '--'}</td>
+                    </tr>
+                `;
+            }).join('');
 
             document.getElementById('detalhes-corpo').innerHTML = `
-                <div class="text-center mb-8">
-                    <div class="inline-block bg-blue-100 text-blue-600 text-[9px] font-black px-4 py-1 rounded-full uppercase mb-4">Relatório Master Analytics</div>
-                    <h3 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter">${t.nome}</h3>
-                    <p class="text-slate-400 font-bold text-[10px] uppercase mt-1">${new Date(t.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'})}</p>
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-black text-slate-800 uppercase italic leading-tight">${t.nome}</h3>
+                    <p class="text-slate-400 font-bold text-[9px] uppercase mt-1">${new Date(t.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'long'})}</p>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4 bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-xl mb-6">
-                    <div><p class="text-[8px] opacity-40 uppercase font-black">Distância</p><p class="text-2xl font-black">${t.distancia}k</p></div>
-                    <div><p class="text-[8px] opacity-40 uppercase font-black">Pace Médio</p><p class="text-2xl font-black text-blue-400 font-mono-performance">${paceMin}:${paceResto}</p></div>
-                    <div><p class="text-[8px] opacity-40 uppercase font-black">Ritmo KM/H</p><p class="text-2xl font-black">${kmh}</p></div>
+                <div class="grid grid-cols-3 gap-3 bg-slate-900 text-white p-5 rounded-[2rem] mb-6 text-center">
+                    <div><p class="text-[8px] opacity-40 uppercase font-black">Total</p><p class="text-xl font-black">${t.distancia}k</p></div>
+                    <div><p class="text-[8px] opacity-40 uppercase font-black">Pace Médio</p><p class="text-xl font-black text-blue-400 font-mono-performance">${paceTotal}</p></div>
+                    <div><p class="text-[8px] opacity-40 uppercase font-black">Elevação</p><p class="text-xl font-black text-orange-400">${t.elevacao}m</p></div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-slate-50 p-4 rounded-3xl border text-center">
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Eficiência</p>
-                        <p class="text-xl font-black text-emerald-500">${eficiencia}</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-3xl border text-center">
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Cadência</p>
-                        <p class="text-xl font-black text-blue-500">${t.cadencia || '--'}</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-3xl border text-center">
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Ganho Elev.</p>
-                        <p class="text-xl font-black text-orange-500">${t.elevacao}m</p>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-3xl border text-center">
-                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">BPM Médio</p>
-                        <p class="text-xl font-black text-rose-500">${t.bpm}</p>
-                    </div>
+                <h4 class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest"><i class="fas fa-list-ol mr-2"></i>Desempenho por Quilômetro</h4>
+                <div class="bg-white border rounded-2xl overflow-hidden mb-6 shadow-inner">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="p-3 text-[8px] font-black uppercase text-slate-400">KM</th>
+                                <th class="p-3 text-[8px] font-black uppercase text-slate-400">Ritmo</th>
+                                <th class="p-3 text-[8px] font-black uppercase text-slate-400">FC Média</th>
+                            </tr>
+                        </thead>
+                        <tbody>${splitsHTML}</tbody>
+                    </table>
                 </div>
 
-                <div class="bg-slate-900 text-white p-8 rounded-[2.5rem] text-center shadow-inner mb-6 relative overflow-hidden">
-                    <h4 class="text-[9px] font-black uppercase text-orange-500 mb-6 tracking-widest italic">Previsão de Performance (Riegel's)</h4>
-                    <div class="flex justify-around relative z-10">
-                        <div><p class="text-[8px] uppercase font-bold opacity-40 mb-1">Tempo em 10k</p><p class="text-xl font-black font-mono-performance">${pred10k}</p></div>
-                        <div class="w-[1px] bg-white/10"></div>
-                        <div><p class="text-[8px] uppercase font-bold opacity-40 mb-1">Tempo em 21.1k</p><p class="text-xl font-black font-mono-performance text-blue-400">${pred21k}</p></div>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 text-left text-[11px] leading-relaxed italic text-blue-800">
-                    <i class="fas fa-robot mr-2 text-blue-600"></i><b>Coach Insight:</b> 
-                    ${t.cadencia > 0 && t.cadencia < 168 ? "Sua cadência está baixa. Aumente a frequência de passos para reduzir o impacto e melhorar sua economia de corrida." : "Cadência em nível de elite! Sua biomecânica está protegendo seu rendimento."}
+                <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 text-[11px] leading-relaxed italic text-orange-800">
+                    <i class="fas fa-chart-line mr-2"></i><b>Análise de Esforço:</b> 
+                    ${t.bpm > 165 ? "Seu batimento médio está alto. Tente focar em treinos regenerativos para melhorar seu condicionamento." : "Ótima zona de esforço aeróbico mantida durante a atividade."}
                 </div>
             `;
             toggleModal('modal-detalhes');
@@ -282,50 +232,31 @@
             document.getElementById('display-nome').innerText = appData.atleta.nome;
             const totalKm = appData.treinos.reduce((a, b) => a + parseFloat(b.distancia), 0);
             document.getElementById('total-km').innerText = Math.round(totalKm);
-            document.getElementById('count-treinos').innerText = appData.treinos.length;
 
             if(appData.treinos.length > 0) {
-                const u = appData.treinos[0];
-                const kmh = (u.distancia / (u.tempoSegundos / 3600));
-                document.getElementById('display-vo2').innerText = Math.round((kmh * 16.6 * 0.18) + 3.5);
-                document.getElementById('display-eficiencia').innerText = u.bpm > 0 ? (kmh / u.bpm).toFixed(2) : "--";
-                
-                const totalSegs = appData.treinos.reduce((a, b) => a + b.tempoSegundos, 0);
-                document.getElementById('pace-geral').innerText = formatarPace(totalSegs / totalKm);
-
                 document.getElementById('lista-treinos').innerHTML = appData.treinos.map(t => `
-                    <div class="group bg-white border-2 p-5 rounded-[2.5rem] flex items-center justify-between hover:border-orange-500 transition-all cursor-pointer shadow-sm" onclick="abrirAnalise('${t.id}')">
+                    <div class="group bg-white border-2 p-5 rounded-[2rem] flex items-center justify-between hover:border-orange-500 transition-all cursor-pointer shadow-sm" onclick="abrirAnalise('${t.id}')">
                         <div class="flex items-center gap-6">
-                            <div class="w-14 h-14 rounded-3xl bg-slate-50 flex flex-col items-center justify-center font-black group-hover:bg-orange-50 transition-colors">
-                                <span class="text-[7px] opacity-40 uppercase">KM</span><div class="text-xl leading-none">${t.distancia}</div>
+                            <div class="w-14 h-14 rounded-2xl bg-slate-50 flex flex-col items-center justify-center font-black">
+                                <span class="text-[7px] opacity-40 uppercase">KM</span><div class="text-xl leading-none font-black">${Math.floor(t.distancia)}</div>
                             </div>
                             <div class="text-left">
-                                <h4 class="font-black text-xs uppercase text-slate-700 truncate max-w-[150px] tracking-tight">${t.nome}</h4>
+                                <h4 class="font-black text-xs uppercase text-slate-700 tracking-tight">${t.nome}</h4>
                                 <div class="flex gap-2 mt-2">
-                                    <span class="metric-pill">BPM: ${t.bpm || '--'}</span>
-                                    <span class="metric-pill">CAD: ${t.cadencia || '--'}</span>
-                                    <span class="metric-pill">${new Date(t.data).toLocaleDateString('pt-BR')}</span>
+                                    <span class="metric-pill">PACE: ${formatarPace(t.tempoSegundos/t.distancia)}</span>
+                                    <span class="metric-pill">FC: ${t.bpm || '--'}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <i class="fab fa-strava text-orange-500 opacity-20 group-hover:opacity-100 transition-opacity"></i>
-                            <button onclick="event.stopPropagation(); removerTreino('${t.id}')" class="text-slate-200 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
-                        </div>
+                        <i class="fab fa-strava text-orange-500 opacity-20 group-hover:opacity-100"></i>
                     </div>
                 `).join('');
             }
-            localStorage.setItem('RunTrackElite_Master_VFinal', JSON.stringify(appData));
-        }
-
-        function formatarTempo(segs) {
-            const h = Math.floor(segs / 3600);
-            const m = Math.floor((segs % 3600) / 60);
-            const s = Math.round(segs % 60);
-            return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` : `${m}:${s.toString().padStart(2,'0')}`;
+            localStorage.setItem('RunTrackElite_Master_VSplits', JSON.stringify(appData));
         }
 
         function formatarPace(segundosPorKm) {
+            if(!segundosPorKm || segundosPorKm === Infinity) return "0:00";
             const m = Math.floor(segundosPorKm / 60);
             const s = Math.round(segundosPorKm % 60);
             return `${m}:${s.toString().padStart(2,'0')}`;
@@ -348,24 +279,11 @@
             toast("Perfil Atualizado!");
         }
 
-        function removerTreino(id) {
-            if(confirm("Remover análise do histórico?")) {
-                appData.treinos = appData.treinos.filter(t => t.id !== id);
-                atualizarInterface();
-            }
-        }
-
-        function limparTudo() {
-            if(confirm("Deseja apagar todos os dados e cache?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
+        function limparTudo() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
         function toast(m) {
             const t = document.createElement('div');
-            t.className = "fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-2xl text-[9px] font-black z-[200] shadow-2xl fade-in uppercase";
+            t.className = "fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-3 rounded-xl text-[9px] font-black z-[200] shadow-2xl fade-in uppercase";
             t.innerText = m;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
