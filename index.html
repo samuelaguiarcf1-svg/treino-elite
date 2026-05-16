@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RunTrack Elite V58 - Master Sync & Analytics</title>
+    <title>RunTrack Elite V59 - Total Sync Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,10 +15,10 @@
         .checkbox-day:checked + label { background-color: #2563eb; color: white; border-color: #2563eb; }
         .dist-base { font-weight: 900; line-height: 1; }
         .dist-decimal { font-size: 0.6em; opacity: 0.5; font-weight: 700; vertical-align: baseline; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .coach-note { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; }
         .metric-pill { @apply bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1; }
-        .metric-card-detalhe { @apply bg-slate-50 p-4 rounded-[2rem] border border-slate-100 text-center transition-all hover:bg-white hover:shadow-md; }
+        .metric-card-detalhe { @apply bg-slate-50 p-4 rounded-[2rem] border border-slate-100 text-center; }
+        .coach-note { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .scale-up { animation: scaleUp 0.2s ease-out; }
         @keyframes scaleUp { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     </style>
@@ -30,13 +30,14 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-5">
                 <div id="avatar-container" class="w-14 h-14 bg-slate-800 rounded-full flex items-center justify-center text-xl border-2 border-blue-500 shadow-inner">
-                    <i class="fas fa-user-ninja"></i>
+                    <i class="fas fa-bolt text-blue-400"></i>
                 </div>
                 <div>
                     <h1 class="text-lg font-black tracking-tight uppercase" id="display-nome">Atleta Elite</h1>
-                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Analytics Dashboard V58</p>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Sincronização Direta Ativa</p>
                 </div>
             </div>
+            
             <div class="flex gap-3">
                 <div class="bg-slate-800 p-2 px-6 rounded-2xl text-center border border-slate-700 shadow-lg">
                     <span class="text-[8px] block uppercase opacity-50 font-black">VO2 Máx</span>
@@ -52,14 +53,14 @@
     </header>
 
     <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-        <!-- VOLUME DASHBOARD -->
+        <!-- DASHBOARD -->
         <section class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-blue-500">
-                <h3 class="text-slate-400 text-[10px] font-black uppercase mb-2 tracking-widest">Volume Total</h3>
+                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Volume Total</h3>
                 <p class="text-4xl" id="km-semana">,0</p>
             </div>
             <div class="bg-white p-6 rounded-3xl shadow-sm border-b-4 border-orange-500 md:col-span-3 text-left px-10 flex flex-col justify-center">
-                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Desgaste Tênis</h3>
+                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Tênis Ativo</h3>
                 <div class="flex items-center gap-6">
                     <p class="text-3xl" id="km-tenis">,0</p>
                     <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner"><div id="barra-tenis" class="bg-orange-500 h-full transition-all duration-1000 w-0"></div></div>
@@ -68,25 +69,24 @@
         </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- AGENDA -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="text-2xl font-black text-slate-800 tracking-tight uppercase italic">Minha Agenda</h2>
                         <div class="flex gap-2">
-                            <button onclick="conectarStravaReal()" class="bg-orange-500 text-white px-5 py-3 rounded-2xl font-black text-[10px] shadow-lg flex items-center gap-2 hover:bg-orange-600 transition">
-                                <i class="fab fa-strava text-lg"></i> SINCRONIZAR
+                            <button onclick="conectarStravaGarantido()" class="bg-orange-500 text-white px-5 py-3 rounded-2xl font-black text-[10px] tracking-widest hover:bg-orange-600 transition shadow-lg flex items-center gap-2">
+                                <i class="fab fa-strava text-lg"></i> SINCRONIZAR 100+
                             </button>
-                            <button onclick="toggleModal('modal-wizard')" class="bg-blue-600 text-white px-5 py-3 rounded-2xl font-black text-[10px] shadow-lg uppercase tracking-widest">+ Planejar</button>
+                            <button onclick="toggleModal('modal-wizard')" class="bg-blue-600 text-white px-5 py-3 rounded-2xl font-black text-[10px] shadow-lg uppercase transition hover:bg-blue-700">+ Planejar</button>
                         </div>
                     </div>
                     <div id="lista-treinos" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- SIMULADOR PACE -->
-            <div class="space-y-6">
-                <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl text-white">
+            <!-- SIMULADOR PACE (MANTIDO) -->
+            <div class="space-y-6 text-center">
+                <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl text-white border border-white/5">
                     <h2 class="text-xl font-black mb-6 text-blue-400 italic">Simulador Pace</h2>
                     <div class="space-y-5">
                         <div class="bg-slate-800 p-4 rounded-3xl border border-white/5 text-center">
@@ -97,18 +97,12 @@
                                 <button onclick="alterarDistancia(0.5)" class="text-slate-500 hover:text-white p-2"><i class="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
-                        <div class="flex gap-2 text-center">
-                            <div class="flex-1 bg-slate-800 p-3 rounded-2xl">
-                                <span class="text-[8px] uppercase text-slate-500 block mb-1">Min</span>
-                                <input type="number" id="sim-pace-min" value="5" oninput="ajustarPeloPace()" class="bg-transparent w-full text-2xl font-black text-center text-white outline-none">
-                            </div>
-                            <div class="flex-1 bg-slate-800 p-3 rounded-2xl">
-                                <span class="text-[8px] uppercase text-slate-500 block mb-1">Seg</span>
-                                <input type="number" id="sim-pace-seg" value="0" oninput="ajustarPeloPace()" class="bg-transparent w-full text-2xl font-black text-center text-white outline-none">
-                            </div>
+                        <div class="flex gap-2">
+                            <input type="number" id="sim-pace-min" value="5" oninput="ajustarPeloPace()" class="flex-1 bg-slate-800 p-3 rounded-2xl text-2xl font-black text-center text-white outline-none">
+                            <input type="number" id="sim-pace-seg" value="0" oninput="ajustarPeloPace()" class="flex-1 bg-slate-800 p-3 rounded-2xl text-2xl font-black text-center text-white outline-none">
                         </div>
-                        <div class="bg-blue-600/10 p-5 rounded-3xl text-center border border-blue-500/20">
-                            <span class="text-[8px] font-black text-blue-400 block mb-1">Velocidade Média</span>
+                        <div class="bg-blue-600/10 p-5 rounded-3xl text-center border border-blue-500/20 shadow-inner">
+                            <span class="text-[8px] uppercase font-black text-blue-400 block mb-1">Velocidade Média</span>
                             <p class="text-2xl font-black text-white"><span id="sim-vel-res">12,0</span> <small class="text-[10px] opacity-40 uppercase tracking-tighter">km/h</small></p>
                         </div>
                     </div>
@@ -121,30 +115,61 @@
     <div id="modal-detalhes" class="fixed inset-0 bg-slate-900/98 backdrop-blur-xl hidden flex items-center justify-center p-4 z-[100]">
         <div class="bg-white w-full max-w-3xl rounded-[3rem] p-8 md:p-12 shadow-2xl overflow-y-auto max-h-[90vh] scale-up">
             <div id="detalhes-header" class="text-center mb-8 border-b pb-6 border-slate-100"></div>
-            <div id="detalhes-corpo" class="space-y-8"></div>
-            
-            <!-- Tabela de Splits -->
-            <div class="mt-8">
-                <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Splits por Quilômetro</h4>
-                <div class="overflow-hidden rounded-3xl border border-slate-100">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-900 text-white uppercase text-[9px]">
-                            <tr><th class="p-4">KM</th><th class="p-4">Pace</th><th class="p-4">BPM</th><th class="p-4">Cadência</th></tr>
-                        </thead>
-                        <tbody id="detalhes-splits-body" class="font-mono-performance"></tbody>
-                    </table>
-                </div>
+            <div id="detalhes-corpo" class="space-y-8 text-center"></div>
+            <div class="mt-8 overflow-hidden rounded-3xl border border-slate-100">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-900 text-white uppercase text-[9px]">
+                        <tr><th class="p-4">KM</th><th class="p-4">Pace</th><th class="p-4">BPM</th><th class="p-4">Cadência</th></tr>
+                    </thead>
+                    <tbody id="detalhes-splits-body" class="font-mono-performance text-slate-700"></tbody>
+                </table>
             </div>
-
-            <div class="mt-10">
-                <button onclick="toggleModal('modal-detalhes')" class="w-full bg-slate-100 text-slate-500 py-5 rounded-2xl font-black uppercase text-xs">Fechar</button>
-            </div>
+            <button onclick="toggleModal('modal-detalhes')" class="w-full mt-8 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase text-xs">Fechar</button>
         </div>
     </div>
 
     <!-- MODAL PERFIL -->
     <div id="modal-perfil" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-[60]">
         <div class="bg-white w-full max-w-md rounded-[3rem] p-8 shadow-2xl">
-            <h3 class="text-2xl font-black mb-6 text-center italic">Configurar Perfil</h3>
+            <h3 class="text-2xl font-black mb-6 text-center italic uppercase tracking-widest">Configuração</h3>
             <form onsubmit="event.preventDefault(); salvarPerfil()" class="space-y-4">
-                <d
+                <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100 mb-2">
+                    <label class="text-[9px] font-black uppercase text-orange-600 block mb-2 text-center font-bold">Strava Client ID</label>
+                    <input type="text" id="strava-id" placeholder="Digite seu ID" class="w-full p-4 bg-white rounded-2xl border-none outline-none text-center font-black text-xl">
+                </div>
+                <input type="text" id="p-nome" placeholder="Nome" class="w-full border-2 p-4 rounded-2xl font-bold text-center">
+                <div class="grid grid-cols-2 gap-2"><input type="number" id="p-idade" placeholder="Idade" class="border-2 p-4 rounded-2xl text-center"><input type="number" step="0.1" id="p-peso" placeholder="Peso kg" class="border-2 p-4 rounded-2xl text-center"></div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg shadow-blue-200">Salvar Dados</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- ESTADO ---
+        let appData = { atleta: { nome: "Atleta Elite", idade: 30, peso: 75, stravaId: "" }, treinos: [] };
+
+        window.onload = () => {
+            const saved = localStorage.getItem('RunTrackElite_V59_Stable');
+            if (saved) appData = JSON.parse(saved);
+            
+            // LÓGICA DE CAPTURA DE TOKEN (Implicit Flow)
+            const urlHash = window.location.hash;
+            if (urlHash.includes("access_token=")) {
+                const token = urlHash.split("access_token=")[1].split("&")[0];
+                window.history.pushState({}, document.title, window.location.pathname);
+                buscarAtividadesStrava(token);
+            }
+
+            atualizarInterface();
+            ajustarPeloPace();
+        };
+
+        // --- MOTOR DE SINCRONIZAÇÃO DEFINITIVO (SEM CORS ERROR) ---
+        function conectarStravaReal() {
+            const clientId = appData.atleta.stravaId;
+            if(!clientId) return alert("Abra o Perfil e cole o seu Client ID do Strava!");
+            
+            // O segredo está aqui: usamos response_type=token
+            const redirectUri = window.location.origin + window.location.pathname;
+            const scope = "activity:read_all";
+            const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&red
